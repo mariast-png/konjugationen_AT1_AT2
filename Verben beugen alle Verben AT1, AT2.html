@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Les verbes – Verben beugen</title>
+<style>
+:root{--bg:#f4f1ff;--t:#26233a;--p:#6c4cf1;--g:#eeeaff;--ok:#d5f3e0;--ko:#fddcdc}
+*{box-sizing:border-box}
+body{margin:0;font:16px/1.5 system-ui,sans-serif;background:var(--bg);color:var(--t)}
+main{max-width:880px;margin:auto;padding:14px 14px 40px}
+h1{margin:.3em 0}h2{margin:0 0 4px;font-size:1.1rem}
+.card{background:#fff;border-radius:16px;padding:16px;margin:14px 0;box-shadow:0 3px 12px #6c4cf122}
+.hint,small{color:#6b6880;font-size:.88rem}
+.sets{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px;margin:8px 0}
+.sets label,.opt,.grp label{background:var(--g);padding:7px 11px;border-radius:10px;cursor:pointer;display:block}
+.sets label:has(input:checked),.opt:has(input:checked),.grp label:has(input:checked){background:var(--p);color:#fff}
+.grp{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+.chip{display:inline-block;padding:2px 10px;margin:2px;border-radius:99px;font-size:.9rem}
+.er{background:#dceafe}.irr{background:#ffe3c7}
+button{font:inherit;border:0;border-radius:12px;padding:9px 16px;background:var(--p);color:#fff;cursor:pointer}
+button.alt{background:var(--g);color:var(--t)}
+input[type=text],select,#bi{font:inherit;padding:6px 10px;border:0;border-radius:9px;background:var(--g);color:var(--t);max-width:100%}
+input:focus,select:focus{outline:0;box-shadow:0 0 0 3px #6c4cf155}
+input[type=radio],input[type=checkbox]{display:none}
+.row,.q{margin:9px 0}
+.opts{display:flex;gap:8px;flex-wrap:wrap;margin-top:5px}
+.opt{padding:6px 12px}
+.ok{background:var(--ok)!important;color:#146c3a!important}
+.bad{background:var(--ko)!important;color:#a42323!important}
+.sol{color:#146c3a;font-weight:600;margin-left:6px}
+.res{margin-top:10px;font-weight:700}
+.ln{display:block;width:100%;text-align:left;margin:6px 0;background:var(--g);color:var(--t)}
+.ln.sel{background:#ffe9a8}
+table{border-collapse:separate;border-spacing:4px}
+td,th{padding:5px 10px;background:var(--g);border-radius:8px;text-align:left}
+.big{font-size:1.6rem;font-weight:700;margin:8px 0}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-top:18px}
+.tab{background:#fff;color:#6b6880;border-radius:12px 12px 0 0;padding:9px 13px;font-weight:600;box-shadow:0 -2px 6px #6c4cf111;border-top:4px solid var(--c)}
+.tab.on{color:var(--t);box-shadow:0 -3px 8px #6c4cf133}
+.tab:not(.on){opacity:.75}
+#ex .card{margin-top:0;border-top-left-radius:0}
+.acc{margin-top:14px;display:flex;gap:5px;flex-wrap:wrap}
+.acc button{padding:5px 11px;background:var(--g);color:var(--t);font-size:1.05rem}
+.ctl{margin-top:12px;display:flex;gap:10px;flex-wrap:wrap}
+details summary{cursor:pointer;font-weight:600}
+</style></head><body><main>
+<h1>🇫🇷 Les verbes – Verben beugen</h1>
+<p class="hint">Wähle deine Verben, löse die Aufgaben, klicke auf „Überprüfen“ – und hol dir danach beliebig oft neue Aufgaben!</p>
+
+<section class="card"><h2>1 · Welche Verben möchtest du üben?</h2>
+<div class="sets" id="sets"></div>
+<div><button class="alt" onclick="setAll(1)">Alle</button> <button class="alt" onclick="setAll(0)">Keine</button></div>
+<div class="grp" id="grp">
+<label><input type="radio" name="grp" value="all" checked>Alle Gruppen</label>
+<label><input type="radio" name="grp" value="er">nur Verben auf -er</label>
+<label><input type="radio" name="grp" value="irr">nur unregelmäßige Verben</label></div>
+<div id="chips"></div>
+<p class="hint"><span class="chip er">blau</span> = Verben auf -er (regelmäßig) &nbsp; <span class="chip irr">orange</span> = unregelmäßige Verben: einfach lernen!</p>
+<details><summary>📘 Merkhilfe: Die Gruppen</summary><div id="ref"></div></details></section>
+
+<div class="tabs" id="tabs"></div>
+<div id="ex"></div>
+</main>
+<script>
+const SETS=[
+["À toi 1 · Unité 2","être:sein"],
+["À toi 1 · Unité 3","rentrer:nach Hause gehen,habiter:wohnen,passer:verbringen,aimer:mögen,regarder:anschauen,écouter:zuhören,parler:sprechen,chercher:suchen"],
+["À toi 1 · Unité 4","avoir:haben,rester:bleiben,adorer:lieben,dessiner:zeichnen,bricoler:basteln,détester:hassen,préférer:bevorzugen"],
+["À toi 1 · Unité 5","ranger:aufräumen,arriver:ankommen,travailler:arbeiten,jouer:spielen,partager:teilen,raconter:erzählen"],
+["À toi 2 · Unité 1","répéter:wiederholen,chanter:singen,faire:machen,inviter:einladen,apporter:mitbringen,acheter:kaufen,coûter:kosten,trouver:finden,appeler:rufen,rigoler:lachen,porter:tragen"],
+["À toi 2 · Unité 2","terminer:beenden,commencer:anfangen,expliquer:erklären,donner:geben,penser:denken,gaspiller:verschwenden"],
+["À toi 2 · Unité 3","retrouver:wiedertreffen,aller:gehen,vouloir:wollen,pouvoir:können,présenter:vorstellen,utiliser:benutzen"],
+["À toi 2 · Unité 4","manger:essen,préparer:vorbereiten,prendre:nehmen,mettre:legen,goûter:probieren,corriger:korrigieren,marcher:laufen"],
+["À toi 2 · Unité 5","visiter:besichtigen,chatter:chatten,organiser:organisieren"]
+].map(s=>({l:s[0],v:s[1].split(",")}));
+const P=['je','tu','il/elle/on','nous','vous','ils/elles'];
+const IRR={être:'suis es est sommes êtes sont',avoir:'ai as a avons avez ont',aller:'vais vas va allons allez vont',faire:'fais fais fait faisons faites font',mettre:'mets mets met mettons mettez mettent',prendre:'prends prends prend prenons prenez prennent',pouvoir:'peux peux peut pouvons pouvez peuvent',vouloir:'veux veux veut voulons voulez veulent'};
+const SP={acheter:{0:'achète',1:'achètes',2:'achète',5:'achètent'},préférer:{0:'préfère',1:'préfères',2:'préfère',5:'préfèrent'},répéter:{0:'répète',1:'répètes',2:'répète',5:'répètent'},appeler:{0:'appelle',1:'appelles',2:'appelle',5:'appellent'},manger:{3:'mangeons'},ranger:{3:'rangeons'},partager:{3:'partageons'},corriger:{3:'corrigeons'},commencer:{3:'commençons'}};
+const EN=['e','es','e','ons','ez','ent'];
+const conj=v=>IRR[v]?IRR[v].split(' '):EN.map((e,i)=>(SP[v]&&SP[v][i])||v.slice(0,-2)+e);
+const SU=[['je',0],['tu',1],['il',2],['elle',2],['on',2],['Marie',2],['Le prof',2],['nous',3],['Léa et moi',3],['vous',4],['ils',5],['elles',5],['Les élèves',5],['Tom et Léa',5]];
+const $=s=>document.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+const rnd=a=>a[Math.random()*a.length|0];
+const sh=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+const sj=i=>rnd(SU.filter(s=>s[1]==i))[0];
+const cap=s=>s[0].toUpperCase()+s.slice(1);
+const pre=(s,f)=>s=='je'?(/^[aeiouhéèêâîôû]/i.test(f)?"j'":'je '):s+' ';
+const norm=s=>s.trim().toLowerCase().replace(/[’`´]/g,"'").replace(/\s+/g,' ');
+const pickV=n=>{let a=[];while(a.length<n)a=a.concat(sh(POOL));return a.slice(0,n)};
+let POOL=[],EXS=[];
+
+// ---------- Auswahl ----------
+$('#sets').innerHTML=SETS.map((s,i)=>`<label><input type="checkbox" class="sc" value="${i}" ${i==1?'checked':''}>${s.l}<br><small style="color:inherit;opacity:.8">${s.v.map(x=>x.split(':')[0]).join(', ')}</small></label>`).join('');
+$('#ref').innerHTML=`<p><b>Verben auf -er</b> (z. B. parler): Endungen anhängen →
+<span class="chip er">-e, -es, -e, -ons, -ez, -ent</span><br><small>Achtung: manger → nous mangeons, commencer → nous commençons, acheter → j'achète, préférer → je préfère, appeler → j'appelle</small></p>
+<p><b>Unregelmäßige Verben – einfach lernen!</b></p><table><tr><th></th>${Object.keys(IRR).map(v=>`<th>${v}</th>`).join('')}</tr>${P.map((p,i)=>`<tr><th>${p}</th>${Object.keys(IRR).map(v=>`<td>${conj(v)[i]}</td>`).join('')}</tr>`).join('')}</table>`;
+function setAll(x){$$('.sc').forEach(c=>c.checked=!!x);update()}
+function update(){
+  const g=$('[name=grp]:checked').value,seen={};POOL=[];
+  $$('.sc:checked').forEach(c=>SETS[c.value].v.forEach(x=>{const [inf,de]=x.split(':');if(seen[inf])return;seen[inf]=1;const irr=!!IRR[inf];if((g=='er'&&irr)||(g=='irr'&&!irr))return;POOL.push({inf,de,irr,f:conj(inf)})}));
+  $('#chips').innerHTML=POOL.map(v=>`<span class="chip ${v.irr?'irr':'er'}" title="${v.de}">${v.inf}</span>`).join('')||'<p class="hint">Wähle mindestens ein Set (und passende Gruppe) aus.</p>';
+  showTab(cur);
+}
+document.addEventListener('change',e=>{if(e.target.matches('.sc,[name=grp]'))update()});
+
+// ---------- Aufgaben ----------
+const sec=(t,d,h)=>`<h2>${t}</h2><p class="hint">${d}</p>${h}`;
+function gapInputs(root){let ok=0,n=0;$$('input[data-a]',root).forEach(i=>{n++;const a=i.dataset.a;if(norm(i.value)==norm(a)){ok++;i.classList.add('ok')}else{i.classList.add('bad');i.insertAdjacentHTML('afterend',`<span class="sol">→ ${a}</span>`)}});return[ok,n]}
+const inp=a=>`<input type="text" data-a="${a}" size="11" autocomplete="off" autocapitalize="off" spellcheck="false">`;
+
+function exGap(){const vs=pickV(6),ix=sh([0,1,2,3,4,5]);
+  return{h:sec('📝 Lücken füllen','Setze die richtige Form des Verbs ein.',vs.map((v,k)=>{const i=ix[k],f=v.f[i];return`<div class="row">${cap(pre(sj(i),f))}${inp(f)} <small>(${v.inf} – ${v.de})</small></div>`}).join('')),c:gapInputs}}
+
+function exMC(){const vs=pickV(5),ix=sh([0,1,2,3,4,5]);
+  const Q=vs.map((v,k)=>{const i=ix[k],f=v.f[i];return{v,i,f,s:sj(i),o:sh([f,...sh([...new Set(v.f)].filter(x=>x!=f)).slice(0,3)])}});
+  return{h:sec('🔘 Multiple Choice','Welche Form passt?',Q.map((q,k)=>`<div class="q">${cap(pre(q.s,q.f))}<b>…</b> <small>(${q.v.inf})</small><div class="opts">${q.o.map(o=>`<label class="opt"><input type="radio" name="mc${k}" value="${o}"><span>${o}</span></label>`).join('')}</div></div>`).join('')),
+  c:r=>{let ok=0;Q.forEach((q,k)=>{const rs=$$(`[name=mc${k}]`,r);const s=rs.find(x=>x.checked);if(s&&s.value==q.f)ok++;rs.forEach(x=>{if(x.value==q.f)x.parentElement.classList.add('ok');else if(x.checked)x.parentElement.classList.add('bad')})});return[ok,Q.length]}}}
+
+function exMatch(){const v=pickV(1)[0],ix=sh([0,1,2,3,4,5]).slice(0,5);
+  return{h:sec('🔗 Zuordnen','Zu welcher Person gehört die Form? ('+v.inf+')',ix.map(i=>`<div class="row"><b>${v.f[i]}</b> → <select data-f="${v.f[i]}"><option value="">?</option>${P.map((p,j)=>`<option value="${j}">${p}</option>`).join('')}</select></div>`).join('')),
+  c:r=>{let ok=0,n=0;$$('select',r).forEach(s=>{n++;const f=s.dataset.f;if(s.value!==''&&v.f[+s.value]==f){ok++;s.classList.add('ok')}else{s.classList.add('bad');s.insertAdjacentHTML('afterend',`<span class="sol">→ ${P.filter((p,j)=>v.f[j]==f).join(' / ')}</span>`)}});return[ok,n]}}}
+
+function exErr(){const vs=pickV(6),nb=2+(Math.random()*2|0),bad=sh([0,1,2,3,4,5]).slice(0,nb);
+  const L=vs.map((v,k)=>{const i=rnd([0,1,2,3,4,5]),f=v.f[i];let s=sj(i),shown=f;
+    if(bad.includes(k)){shown=rnd(v.f.filter(x=>x!=f))}return{s,f,shown,wrong:bad.includes(k)}});
+  return{h:sec('🔍 Fehler finden','Klicke alle Sätze an, in denen die Verbform falsch ist.',L.map(l=>`<button class="ln" onclick="this.classList.toggle('sel')">${cap(pre(l.s,l.shown))}${l.shown}</button>`).join('')),
+  c:r=>{let ok=0;$$('.ln',r).forEach((b,k)=>{const l=L[k],sel=b.classList.contains('sel');if(sel==l.wrong){ok++;b.classList.add('ok')}else b.classList.add('bad');if(l.wrong)b.insertAdjacentHTML('beforeend',`<span class="sol">→ ${cap(pre(l.s,l.f))}${l.f}</span>`)});return[ok,L.length]}}}
+
+function exTable(){const v=pickV(1)[0];
+  return{h:sec('📊 Tabelle ausfüllen','Trage alle gebeugten Formen von <b>'+v.inf+'</b> ('+v.de+') ein.','<table>'+P.map((p,i)=>`<tr><th>${p}</th><td>${inp(v.f[i])}</td></tr>`).join('')+'</table>'),c:gapInputs}}
+
+function exScr(){const vs=pickV(4);
+  const scr=f=>{let s,t=0;do{s=sh(f.split('')).join('')}while(s==f&&++t<9);return s.split('').join(' ')};
+  return{h:sec('🧩 Buchstabensalat <small>(neu)</small>','Bringe die Buchstaben in die richtige Reihenfolge und schreibe die Form auf.',vs.map(v=>{const i=rnd([0,1,2,3,4,5]),f=v.f[i];return`<div class="row">${cap(pre(sj(i),f))}<b style="letter-spacing:2px">${scr(f)}</b> <small>(${v.inf})</small><br>${inp(f)}</div>`}).join('')),c:gapInputs}}
+
+const TABS=[['Lücken füllen',exGap,'#3d6fa5'],['Multiple Choice',exMC,'#3f7a55'],['Zuordnen',exMatch,'#d9822b'],['Fehler finden',exErr,'#b5335a'],['Tabelle',exTable,'#6a5aa8'],['Buchstabensalat',exScr,'#1e8f8f'],['⚡ Blitz',null,'#c9a227']];
+let cur=0,EX=null,LAST=null;
+document.addEventListener('focusin',e=>{if(e.target.matches('input[type=text]'))LAST=e.target});
+const ACC=['à','â','ç','é','è','ê','ë','î','ï','ô','ù','û','œ'];
+const accBar=()=>`<div class="acc">${ACC.map(c=>`<button type="button" onmousedown="event.preventDefault()" onclick="ins('${c}')">${c}</button>`).join('')}</div>`;
+function ins(c){const i=LAST;if(!i||!document.contains(i))return;const a=i.selectionStart??i.value.length,b=i.selectionEnd??a;i.value=i.value.slice(0,a)+c+i.value.slice(b);i.focus();i.setSelectionRange(a+1,a+1)}
+function showTab(k){
+  cur=k;clearInterval(bt);
+  $('#tabs').innerHTML=TABS.map((t,i)=>`<button class="tab${i==k?' on':''}" style="--c:${t[2]}" onclick="showTab(${i})">${t[0]}</button>`).join('');
+  if(k==6){$('#ex').innerHTML=`<section class="card"><h2>⚡ Blitz-Runde</h2><p class="hint">60 Sekunden: Tippe so viele richtige Formen wie möglich (Verben deiner Auswahl). Serien bringen Bonuspunkte!</p><button onclick="blitz()">Blitz starten</button><div id="bz"></div>${accBar()}</section>`;return}
+  newTask();
+}
+function newRound(){showTab(cur)}
+function newTask(){
+  if(!POOL.length){$('#ex').innerHTML='';return}
+  EX=TABS[cur][1]();
+  $('#ex').innerHTML=`<section class="card">${EX.h}${accBar()}<div class="ctl"><button onclick="checkTask()">✔ Überprüfen</button><button class="alt" onclick="newTask()">🔄 Neue Aufgaben</button></div><div id="rs"></div></section>`;
+}
+function checkTask(){
+  const r=$('#ex .card');$$('.sol,.res',r).forEach(x=>x.remove());$$('.ok,.bad',r).forEach(x=>x.classList.remove('ok','bad'));
+  const [a,b]=EX.c(r);
+  $('#rs').innerHTML=`<div class="res">${a==b?'🌟 Bravo ! ':''}${a} / ${b} richtig${a==b?' – hol dir neue Aufgaben!':' – schau dir die grünen Lösungen an.'}</div>`;
+}
+
+// ---------- Blitz ----------
+let bt,bs,bk,bq,best=0;
+function blitz(){
+  if(!POOL.length)return;bs=0;bk=0;let t=60;
+  $('#bz').innerHTML='<div class="big" id="bq"></div><input id="bi" type="text" size="16" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Form + Enter"><div class="hint" id="bm"></div><div id="bst"></div>';
+  const info=()=>$('#bst').textContent=`⏱ ${t} s · Punkte: ${bs} · Serie: ${bk}`;
+  const next=()=>{const v=rnd(POOL),i=Math.random()*6|0;bq=v.f[i];$('#bq').textContent=P[i]+' · '+v.inf};
+  next();info();$('#bi').focus();
+  $('#bi').onkeydown=e=>{if(e.key!='Enter')return;
+    if(norm(e.target.value)==norm(bq)){bs+=10+Math.min(bk,5)*2;bk++;$('#bm').textContent='✔ richtig!'}else{bk=0;$('#bm').textContent='✘ '+bq}
+    e.target.value='';next();info()};
+  clearInterval(bt);bt=setInterval(()=>{t--;info();if(t<=0){clearInterval(bt);best=Math.max(best,bs);
+    $('#bz').innerHTML=`<div class="big">Zeit! ${bs} Punkte</div><p>Rekord: ${best}</p><button onclick="blitz()">Nochmal</button>`}},1000);
+}
+update();
+</script></body></html>
